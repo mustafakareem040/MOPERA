@@ -1,0 +1,21 @@
+
+P
+ app/src/main/AndroidManifest.xml,8/c/8c55c3ccc257e5907959013f99656e4c8ec3903e
+n
+>app/src/main/java/com/example/mopera/ui/components/Keyboard.kt,2/9/293d21b9e2973674575806e0a311f16c89a1a456
+n
+>app/src/main/java/com/example/mopera/ui/episodes/EpisodesUI.kt,5/0/50334ab08ed868b92aca6bbf9aec2201809525cd
+k
+;app/src/main/java/com/example/mopera/ui/components/Title.kt,8/4/847c03de45223dc37336602cde3a0d5962eb5155
+d
+4app/src/main/java/com/example/mopera/MainActivity.kt,6/2/62d1143cd39fc3a0b7349e1e95d99e229b664cb4
+f
+6app/src/main/java/com/example/mopera/ui/theme/Theme.kt,8/5/85c8baf0054261ac5f8938532d23affe07e6604e
+I
+gradle/libs.versions.toml,d/7/d7595319a0658be6f1ed500ad590d42e4b28bc4f
+f
+6app/src/main/java/com/example/mopera/ui/assets/Keys.kt,5/a/5ace532bf81ca0472bcb648927d3ca34fe1c82b3
+x
+Happ/src/main/java/com/example/mopera/ui/videoPlayer/VideoPlayerScreen.kt,0/f/0f409b6dbf8395464a5d57828c1a94cdb962c21e
+k
+;app/src/main/java/com/example/mopera/api/MediaDetailsAPI.kt,b/0/b0122a4dae6ef6569027090cd0f0221a87b36d2d
