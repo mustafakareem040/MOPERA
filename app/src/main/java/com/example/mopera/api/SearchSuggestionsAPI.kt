@@ -4,7 +4,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 
 
-object SearchSuggestions: API<List<String>> {
+object SearchSuggestionsAPI: API<List<String>> {
     private const val URL = "https://v3.sg.media-imdb.com/suggestion/titles/x/"
 
     override suspend fun fetch(query: String): List<String> {

@@ -1,4 +1,4 @@
-package com.example.mopera.ui.screens.SearchScreen
+package com.example.mopera.ui.screens.searchScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row

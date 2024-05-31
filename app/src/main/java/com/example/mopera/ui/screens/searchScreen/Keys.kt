@@ -1,5 +1,6 @@
-package com.example.mopera.ui.screens.SearchScreen
+package com.example.mopera.ui.screens.searchScreen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -9,6 +10,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Border
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Icon
 import androidx.tv.material3.IconButton
@@ -27,6 +29,9 @@ inline fun KeyButton(letter: Char, crossinline onKeyPressed: (Char) -> Unit) {
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ),
+        border = ButtonDefaults.border(
+            focusedBorder = Border(BorderStroke(2.dp, MaterialTheme.colorScheme.border))
         ),
         modifier = Modifier
             .padding(2.dp)
@@ -52,6 +57,9 @@ fun KeyIcon(
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
+        border = ButtonDefaults.border(
+            focusedBorder = Border(BorderStroke(2.dp, MaterialTheme.colorScheme.border))
+        ),
         modifier = Modifier
             .padding(2.dp)
             .width(width)
@@ -73,6 +81,9 @@ fun KeyIcon(vector: ImageVector, contentDescription: String, width: Dp = 40.dp,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ),
+        border = ButtonDefaults.border(
+            focusedBorder = Border(BorderStroke(2.dp, MaterialTheme.colorScheme.border))
         ),
         modifier = Modifier
             .padding(2.dp)

@@ -1,5 +1,5 @@
-package com.example.mopera.api
-object Utilities {
+package com.example.mopera.utils
+object HelperFunctions {
     fun convert(input: Float): String {
         val t = input / 3600
         val hours = t.toInt()

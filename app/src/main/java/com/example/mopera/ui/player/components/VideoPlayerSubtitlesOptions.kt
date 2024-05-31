@@ -1,4 +1,4 @@
-package com.example.mopera.ui.VideoPlayer.components
+package com.example.mopera.ui.player.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement

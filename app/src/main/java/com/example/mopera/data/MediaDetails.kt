@@ -32,7 +32,7 @@ data class Category(
 
 
 @Serializable
-data class MovieDetails(
+data class MediaDetails(
     val nb: Int,
     @SerialName("en_title") val enTitle: String,
     @SerialName("ar_title") val arTitle: String,

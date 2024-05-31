@@ -1,4 +1,4 @@
-package com.example.mopera.ui.screens.EpisodesScreen
+package com.example.mopera.ui.components
 
 enum class LoadState {
     SUCCESS,

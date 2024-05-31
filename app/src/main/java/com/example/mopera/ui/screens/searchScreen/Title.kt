@@ -1,18 +1,11 @@
-package com.example.mopera.ui.screens.SearchScreen
+package com.example.mopera.ui.screens.searchScreen
 
-import MovieDescription
+import MediaSearchSuggestion
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,8 +21,9 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.mopera.R
 import com.example.mopera.api.MediaDetailsAPI
-import com.example.mopera.api.Utilities
+import com.example.mopera.data.MediaDetails
 import com.example.mopera.data.MediaType
+import com.example.mopera.utils.HelperFunctions
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,36 +48,42 @@ fun ImageCard(url: String) {
 }
 
 @Composable
-fun Title(movie: MovieDescription, navController: NavHostController) {
+fun Title(movie: MediaSearchSuggestion, navController: NavHostController) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    var details by remember { mutableStateOf<MediaDetails?>(null) }
+
+    LaunchedEffect(movie) {
+        coroutineScope.launch {
+            details = MediaDetailsAPI.fetch(movie.nb)
+        }
+    }
 
     CompactCard(
         onClick = {
-            coroutineScope.launch {
-                val details = MediaDetailsAPI.fetch(movie.nb.toInt())
-                if (details == null) {
-                    Toast.makeText(context, "Show doesn't exist", Toast.LENGTH_LONG).show()
-                } else {
+            if (details == null) {
+                Toast.makeText(context, "Show doesn't exist", Toast.LENGTH_LONG).show()
+            } else {
+                if (movie.kind == MediaType.MOVIE) {
                     navController.navigate("movie/${movie.nb}")
+                } else {
+                    navController.navigate("series/${movie.nb}")
                 }
             }
         },
         subtitle = {
-                   Row {
-                       Row(
-                           modifier = Modifier
-                               .size(200.dp, 24.dp)
-                               .padding(horizontal = 8.dp),
-                           horizontalArrangement = Arrangement.SpaceBetween,
-                           verticalAlignment = Alignment.CenterVertically
-                       ) {
-                           Text(text = "⭐${movie.stars}", color =  MaterialTheme.colorScheme.onSurfaceVariant)
-                           Text(text = if (movie.kind == MediaType.MOVIE) "Movie" else "Series", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                           Text(text = movie.year, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                           Text(text = if (movie.kind == MediaType.MOVIE) Utilities.convert(movie.duration) else "S${movie.season}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                       }
-                   }
+            Row(
+                modifier = Modifier
+                    .size(200.dp, 24.dp)
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "⭐${movie.stars}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = if (movie.kind == MediaType.MOVIE) "Movie" else "Series", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = movie.year, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = if (movie.kind == MediaType.MOVIE) HelperFunctions.convert(movie.duration) else "S${movie.season}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         },
         image = { ImageCard(movie.imgMediumThumbObjUrl) },
         title = {

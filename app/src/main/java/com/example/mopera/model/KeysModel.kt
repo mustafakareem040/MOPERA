@@ -1,4 +1,4 @@
-package com.example.mopera.ui.model
+package com.example.mopera.model
 
 import androidx.compose.runtime.Immutable
 

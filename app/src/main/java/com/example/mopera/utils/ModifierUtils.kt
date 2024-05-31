@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.mopera.ui.utils
+package com.example.mopera.utils
 
 import android.view.KeyEvent
 import androidx.compose.ui.Modifier

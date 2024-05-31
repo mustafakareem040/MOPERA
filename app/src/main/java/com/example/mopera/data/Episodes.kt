@@ -1,3 +1,13 @@
 package com.example.mopera.data
 
-data class Episodes()
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Episode(
+    val nb: Int,
+    val season: Int,
+    val episodeNummer: Short,
+)
+
+
+

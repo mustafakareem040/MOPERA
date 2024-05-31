@@ -1,12 +1,14 @@
-package com.example.mopera.ui.model
+package com.example.mopera.model
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.mopera.ui.SearchScreen.insert
 
-
+fun String.insert(index: Int, charToInsert: Char): String {
+    if (index == this.length) return this + charToInsert
+    return StringBuilder(this).insert(index, charToInsert).toString()
+}
 object Node {
     var value by mutableStateOf("")
     var isArabic by mutableStateOf(false)

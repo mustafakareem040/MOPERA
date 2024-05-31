@@ -17,8 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -26,13 +24,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import com.example.mopera.api.MediaDetailsAPI
 import com.example.mopera.api.VideoFormatAPI
 import com.example.mopera.data.Media
-import com.example.mopera.ui.components.KeyboardButtons
+import com.example.mopera.ui.screens.episodesScreen.EpisodesUI
+import com.example.mopera.ui.components.LoadState
+import com.example.mopera.ui.components.LoadingScreen
 import com.example.mopera.ui.theme.MOPERATheme
-import com.example.mopera.ui.videoPlayer.VideoPlayerScreenContent
+import com.example.mopera.ui.player.VideoPlayerScreenContent
+import com.example.mopera.ui.screens.searchScreen.SearchScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -44,7 +46,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MOPERAApp()
+            MOPERATheme {
+                MOPERAApp()
+            }
         }
     }
 
@@ -53,18 +57,16 @@ class MainActivity : ComponentActivity() {
         var showSplashScreen by remember { mutableStateOf(true) }
         val navController = rememberNavController()
 
-        LaunchedEffect(Unit) {
-            delay(2000) // Display the splash screen for 2 seconds
+        LaunchedEffect(showSplashScreen) {
+            delay(2000)
             showSplashScreen = false
         }
         MOPERATheme {
-            Surface(modifier = Modifier.fillMaxSize()) {
                 if (showSplashScreen) {
                     SplashScreen()
                 } else {
                     MainScreen(navController)
                 }
-            }
         }
     }
 
@@ -73,13 +75,12 @@ class MainActivity : ComponentActivity() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black),
+                .background(MaterialTheme.colorScheme.surface),
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "MOPERA Logo",
-                modifier = Modifier.scale(3f)
+                painter = painterResource(id = R.drawable.banner),
+                contentDescription = "MOPERA banner"
             )
         }
     }
@@ -89,7 +90,16 @@ class MainActivity : ComponentActivity() {
         NavHost(navController = navController, startDestination = "home") {
             composable("home") {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    KeyboardButtons(navController = navController)
+                    SearchScreen(navController = navController)
+                }
+            }
+            composable(
+                route = "series/{nb}",
+                arguments = listOf(navArgument("nb") { type = NavType.IntType })
+            ) {
+                val key = it.arguments?.getInt("nb") ?: return@composable
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    EpisodesUI(nb = key, navController = navController)
                 }
             }
             composable(
@@ -98,15 +108,20 @@ class MainActivity : ComponentActivity() {
             ) {
                 val key = it.arguments?.getInt("nb") ?: return@composable
                 var movie by remember { mutableStateOf<Media?>(null) }
-
+                val state = remember(movie) {
+                    if (movie == null) LoadState.LOADING else LoadState.SUCCESS}
                 LaunchedEffect(key) {
                     movie = fetchMovieData(key)
                 }
-
-                movie?.let { movieData ->
-                    VideoPlayerScreenContent(movieData) {
-                        navController.popBackStack()
-                        navController.navigate("home")
+                if (state == LoadState.LOADING) LoadingScreen()
+                else {
+                    movie?.let { movieData ->
+                        VideoPlayerScreenContent(movieData) {
+                            navController.popBackStack()
+                            if (movieData.details.kind == "1")
+                                navController.navigate("home")
+                            else navController.navigate("series/$key")
+                        }
                     }
                 }
             }
@@ -124,21 +139,11 @@ class MainActivity : ComponentActivity() {
 
     private suspend fun fetchMovieData(key: Int): Media? {
         return withContext(Dispatchers.IO) {
-            // Use coroutineScope to launch parallel tasks
             coroutineScope {
                 val detailsDeferred = async { MediaDetailsAPI.fetch(key) }
                 val formatsDeferred = async { VideoFormatAPI.fetch(key) }
-
-                // Await both deferred results simultaneously
                 val detailData = detailsDeferred.await()
-                val formats = formatsDeferred.await()
-
-                // Only create Media object if detailData is not null
-                if (detailData != null) {
-                    Media(detailData, formats)
-                } else {
-                    null
-                }
+                detailData?.run { Media(detailData, formatsDeferred.await()) }
             }
         }
     }

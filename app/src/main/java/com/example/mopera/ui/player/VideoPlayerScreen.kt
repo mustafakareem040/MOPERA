@@ -1,4 +1,4 @@
-package com.example.mopera.ui.VideoPlayer
+package com.example.mopera.ui.player
 
 import android.net.Uri
 import android.util.TypedValue.COMPLEX_UNIT_SP
@@ -54,19 +54,19 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.example.mopera.data.Media
 import com.example.mopera.utils.handleDPadKeyEvents
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerControlsIcon
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerMainFrame
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerMediaTitle
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerOverlay
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerPulse
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerPulseState
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerQualityOptions
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerSeeker
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerSettingsMenuState
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerState
-import com.example.mopera.ui.VideoPlayer.components.VideoPlayerSubtitlesOptions
-import com.example.mopera.ui.VideoPlayer.components.rememberVideoPlayerPulseState
-import com.example.mopera.ui.VideoPlayer.components.rememberVideoPlayerState
+import com.example.mopera.ui.player.components.VideoPlayerControlsIcon
+import com.example.mopera.ui.player.components.VideoPlayerMainFrame
+import com.example.mopera.ui.player.components.VideoPlayerMediaTitle
+import com.example.mopera.ui.player.components.VideoPlayerOverlay
+import com.example.mopera.ui.player.components.VideoPlayerPulse
+import com.example.mopera.ui.player.components.VideoPlayerPulseState
+import com.example.mopera.ui.player.components.VideoPlayerQualityOptions
+import com.example.mopera.ui.player.components.VideoPlayerSeeker
+import com.example.mopera.ui.player.components.VideoPlayerSettingsMenuState
+import com.example.mopera.ui.player.components.VideoPlayerState
+import com.example.mopera.ui.player.components.VideoPlayerSubtitlesOptions
+import com.example.mopera.ui.player.components.rememberVideoPlayerPulseState
+import com.example.mopera.ui.player.components.rememberVideoPlayerState
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 

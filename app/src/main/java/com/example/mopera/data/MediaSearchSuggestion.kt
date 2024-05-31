@@ -8,7 +8,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable
-data class MovieDescription(
+data class MediaSearchSuggestion(
     val nb: Int,
     val ar_title: String,
     val en_title: String,

@@ -1,14 +1,14 @@
 package com.example.mopera.api
 
-import MovieDescription
+import MediaSearchSuggestion
 import com.example.mopera.data.MediaType
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.runBlocking
 
 
-object MediaSearchResult: API<List<MovieDescription>> {
-    override suspend fun fetch(query: String, mediaType: MediaType): List<MovieDescription> {
+object MediaSearchResult: API<List<MediaSearchSuggestion>> {
+    override suspend fun fetch(query: String, mediaType: MediaType): List<MediaSearchSuggestion> {
         return try {
             if (mediaType == MediaType.MOVIE) {
                 fetchMovies(query);
@@ -19,7 +19,7 @@ object MediaSearchResult: API<List<MovieDescription>> {
             emptyList()
         }
     }
-    suspend fun fetchMovies(title: String): List<MovieDescription> {
+    suspend fun fetchMovies(title: String): List<MediaSearchSuggestion> {
         try {
             val url =
                 "https://cinemana.shabakaty.com/api/android/AdvancedSearch?level=1&videoTitle=${title}&staffTitle=${title}&page=0&year=1900,2024&type=movies"
@@ -29,7 +29,7 @@ object MediaSearchResult: API<List<MovieDescription>> {
             return emptyList()
         }
     }
-    suspend fun fetchSeries(title: String): List<MovieDescription> {
+    suspend fun fetchSeries(title: String): List<MediaSearchSuggestion> {
         try {
             val url = "https://cinemana.shabakaty.com/api/android/AdvancedSearch?level=1&videoTitle=${title}&staffTitle=${title}&page=0&year=1900,2024&type=series"
             return API.client.get(url).body()

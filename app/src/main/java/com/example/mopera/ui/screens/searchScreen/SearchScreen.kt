@@ -1,6 +1,6 @@
-package com.example.mopera.ui.screens.SearchScreen
+package com.example.mopera.ui.screens.searchScreen
 
-import MovieDescription
+import MediaSearchSuggestion
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,42 +35,39 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.example.mopera.api.MediaSearchResult.fetchMovies
 import com.example.mopera.api.MediaSearchResult.fetchSeries
-import com.example.mopera.api.SearchSuggestions.fetch
+import com.example.mopera.api.SearchSuggestionsAPI.fetch
 import com.example.mopera.model.Node
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
-fun String.insert(index: Int, charToInsert: Char): String {
-    if (index == this.length) return this + charToInsert
-    return StringBuilder(this).insert(index, charToInsert).toString()
-}
+
 
 
 @Composable
 fun SearchScreen(navController: NavHostController) {
-    var suggestionList by remember { mutableStateOf(listOf<String>()) }
-    var movies by remember { mutableStateOf(listOf<MovieDescription>()) }
-    var series by remember { mutableStateOf(listOf<MovieDescription>()) }
+    var suggestionList by remember { mutableStateOf<List<String>?>(null) }
+    var movies by remember { mutableStateOf<List<MediaSearchSuggestion>?>(null) }
+    var series by remember { mutableStateOf<List<MediaSearchSuggestion>?>(null) }
     val scroller = rememberTvLazyGridState()
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(Node.value) {
-        val fetchedResults = coroutineScope {
-            val fetchedSuggestionList = async(Dispatchers.IO) { fetch(Node.value) }
-            val fetchedMovies = async(Dispatchers.IO) { fetchMovies(Node.value) }
-            val fetchedSeries = async(Dispatchers.IO) { fetchSeries(Node.value) }
-            Triple(
-                fetchedSuggestionList.await(),
-                fetchedMovies.await(),
-                fetchedSeries.await()
-            )
+        coroutineScope.launch {
+            val suggestionJob = launch(Dispatchers.IO) {
+                suggestionList = fetch(Node.value)
+            }
+            val moviesJob = launch(Dispatchers.IO) {
+                movies = fetchMovies(Node.value)
+            }
+            val seriesJob = launch(Dispatchers.IO) {
+                series = fetchSeries(Node.value)
+            }
+            suggestionJob.join()
+            moviesJob.join()
+            seriesJob.join()
+            scroller.scrollToItem(0)
         }
-
-        suggestionList = fetchedResults.first
-        movies = fetchedResults.second
-        series = fetchedResults.third
-
-        scroller.scrollToItem(0)
     }
 
     Row(
@@ -81,19 +79,21 @@ fun SearchScreen(navController: NavHostController) {
         var idx: Int
         TvLazyVerticalGrid(columns = TvGridCells.Adaptive(minSize = 200.dp),
             modifier = Modifier.fillMaxWidth(0.5f), state = scroller) {
-            items(movies.size + series.size) { index ->
-                if (index < movies.size + series.size) {
+            val itemsCount = (movies?.size ?: 0) + (series?.size ?: 0)
+            if (itemsCount == 0) {
+                item {
+                    Text("Loading...", Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.titleMedium)
+                }
+            } else {
+                items(itemsCount) { index ->
                     idx = index / 2
-                    val movie = if (index % 2 == 0 && idx < movies.size) {
-                        movies[idx]
-                    }
-                    else if (idx < series.size) {
-                        series[idx]
-                    }
-                    else if (idx < movies.size) {
-                        movies[idx]
-                    }
-                    else null
+                    val movie = if (index % 2 == 0 && idx < (movies?.size ?: 0)) {
+                        movies?.get(idx)
+                    } else if (idx < (series?.size ?: 0)) {
+                        series?.get(idx)
+                    } else if (idx < (movies?.size ?: 0)) {
+                        movies?.get(idx)
+                    } else null
 
                     movie?.let {
                         Title(navController = navController, movie = it)
@@ -110,7 +110,8 @@ fun SearchScreen(navController: NavHostController) {
         Column(modifier = Modifier.padding(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
             Keyboard()
-            suggestionList.take(3).forEach { item ->
+            suggestionList?.take(4
+            )?.forEach { item ->
                 Button(
                     onClick = {
                         Node.setSearchString(item)

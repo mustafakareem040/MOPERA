@@ -4,6 +4,6 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class Media(
-    val details: MovieDetails,
+    val details: MediaDetails,
     val formats: List<VideoFormat>
 )

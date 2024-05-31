@@ -1,4 +1,4 @@
-package com.example.mopera.ui.VideoPlayer.components
+package com.example.mopera.ui.player.components
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
