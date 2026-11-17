@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,8 @@ import com.example.mopera.ui.components.LoadState
 import com.example.mopera.ui.components.LoadingScreen
 import com.example.mopera.ui.theme.MOPERATheme
 import com.example.mopera.ui.player.VideoPlayerScreenContent
+import com.example.mopera.ui.screens.homeScreen.HomeScreen
+import com.example.mopera.ui.screens.homeScreen.HomeViewModel
 import com.example.mopera.ui.screens.searchScreen.SearchScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -43,17 +46,20 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+    private val homeViewModel: HomeViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MOPERATheme {
-                MOPERAApp()
+                // Created right away, so the home rows load while the splash shows.
+                MOPERAApp(homeViewModel)
             }
         }
     }
 
     @Composable
-    fun MOPERAApp() {
+    fun MOPERAApp(homeViewModel: HomeViewModel) {
         var showSplashScreen by remember { mutableStateOf(true) }
         val navController = rememberNavController()
 
@@ -65,7 +71,7 @@ class MainActivity : ComponentActivity() {
                 if (showSplashScreen) {
                     SplashScreen()
                 } else {
-                    MainScreen(navController)
+                    MainScreen(navController, homeViewModel)
                 }
         }
     }
@@ -86,9 +92,22 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun MainScreen(navController: NavHostController) {
+    fun MainScreen(navController: NavHostController, homeViewModel: HomeViewModel) {
         NavHost(navController = navController, startDestination = "home") {
             composable("home") {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    HomeScreen(
+                        viewModel = homeViewModel,
+                        onOpenVideo = { video ->
+                            navController.navigateFromHome(
+                                if (video.isSeries) "series/${video.nb}" else "movie/${video.nb}"
+                            )
+                        },
+                        onOpenSearch = { navController.navigateFromHome("search") }
+                    )
+                }
+            }
+            composable("search") {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     SearchScreen(navController = navController)
                 }
@@ -118,14 +137,19 @@ class MainActivity : ComponentActivity() {
                     movie?.let { movieData ->
                         VideoPlayerScreenContent(movieData) {
                             navController.popBackStack()
-                            if (movieData.details.kind == "1")
-                                navController.navigate("home")
-                            else navController.navigate("series/$key")
+                            // A movie goes back to where it was opened; an episode to its series.
+                            if (movieData.details.kind != "1")
+                                navController.navigate("series/$key")
                         }
                     }
                 }
             }
         }
+    }
+
+    // A second press while the first screen is still opening is ignored.
+    private fun NavHostController.navigateFromHome(route: String) {
+        if (currentDestination?.route == "home") navigate(route)
     }
 
     override fun attachBaseContext(newBase: Context) {
